@@ -1,12 +1,12 @@
 <Query Kind="Program">
-  <NuGetReference>Microsoft.Graph</NuGetReference>
+  <NuGetReference Prerelease="true">Microsoft.Graph.Beta</NuGetReference>
   <NuGetReference>Microsoft.Identity.Client</NuGetReference>
   <Namespace>Microsoft.Graph</Namespace>
   <Namespace>Microsoft.Identity.Client</Namespace>
   <Namespace>System.Net.Http</Namespace>
+  <Namespace>System.Net.Http.Headers</Namespace>
   <Namespace>System.Text.Json</Namespace>
   <Namespace>System.Text.Json.Serialization</Namespace>
-  <Namespace>System.Net.Http.Headers</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
