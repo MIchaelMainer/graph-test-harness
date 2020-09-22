@@ -1,4 +1,6 @@
-<Query Kind="Statements" />
+<Query Kind="Statements">
+  <Namespace>System.Net</Namespace>
+</Query>
 
 string v1_0 = "https://graph.microsoft.com/v1.0/$metadata";
 string beta = "https://graph.microsoft.com/beta/$metadata";
@@ -48,7 +50,18 @@ var results = xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Co
 //var results = xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}EntityType");
 
 // Get all abstract entity types. 28
-var results = xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}EntityType").Where(m => m.Attributes("Abstract").Any());
+// var results = xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}EntityType").Where(m => m.Attributes("Abstract").Any());
+
+// Get all actions with a OData primitive return types (not stream)
+var results = xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Action").Where(m => m.Descendants("{http://docs.oasis-open.org/odata/ns/edm}ReturnType")
+																									 .Attributes("Type")
+																									 .Any(x => x.Value.StartsWith("Edm.") && !x.Value.StartsWith("Edm.Stream")));
+
+var results2 = xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Function").Where(m => m.Descendants("{http://docs.oasis-open.org/odata/ns/edm}ReturnType")
+																									 .Attributes("Type")
+																									 .Any(x => x.Value.StartsWith("Edm.") && !x.Value.StartsWith("Edm.Stream")));
+
 
 
 results.Dump();
+results2.Dump();

@@ -3,13 +3,16 @@
   <Namespace>Microsoft.Graph</Namespace>
   <Namespace>Newtonsoft.Json.Linq</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>M365x462896</Namespace>
 </Query>
 
 async Task Main()
 {
-	var client = V1.GetConfidentialClient();
+	//var client = M365x462896.V1.GetConfidentialClient();
+	var chambele_client = Chambele.V1.GetConfidentialClient();
 
-	await Temp(client);
+	//await Temp(client);
+	await UseChambele(chambele_client);
 
 	//await DownloadDoc(client);
 	//await GetUser(client);
@@ -17,6 +20,14 @@ async Task Main()
 	//await CreateMailfolders(client);
 	//await CalendarView(client);
 	//await CreateGroup(client);
+}
+
+static async Task UseChambele(Microsoft.Graph.GraphServiceClient client)
+{
+	var user = "michael@chambele.onmicrosoft.com";
+	
+	await CreateAndUpdateEvent(client, user);
+	await CreateAndUpdateEventUTC(client, user);
 }
 
 static async Task Temp(Microsoft.Graph.GraphServiceClient client)
@@ -28,6 +39,58 @@ static async Task Temp(Microsoft.Graph.GraphServiceClient client)
 		//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Root.Children.Request().GetAsync();
 		//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Items["01KA5JMEA7GNMTADXTINDZ7OW7ROGFDU7N"].Request().Expand(i => i.Analytics).GetAsync();
 		//var result = await client.Users.Request().Expand("approleassignments").Select("id,mail,displayname,userPrincipalName,MobilePhone,Department,OfficeLocation,UserType,DeletedDateTime,createddatetime").GetAsync();
+}
+
+static async Task CreateAndUpdateEvent(Microsoft.Graph.GraphServiceClient client, string user)
+{
+	var @event = new Event
+	{
+		Subject = "Test subject - Created with PST",
+		Body = new ItemBody { Content = "Test body content" },
+		Start = new DateTimeTimeZone { DateTime = "2020-09-16T18:00:00.0000000", TimeZone = "Pacific Standard Time" },
+		End = new DateTimeTimeZone { DateTime = "2020-09-16T18:30:00.0000000", TimeZone = "Pacific Standard Time" }
+	};
+
+	var result = await client.Users[user].Events.Request().AddAsync(@event);
+	result.Dump();
+
+	var patchEventObject = new Event
+	{
+		Start = new DateTimeTimeZone { DateTime = "2020-09-16T19:00:00.0000000", TimeZone = "Pacific Standard Time" },
+		End = new DateTimeTimeZone { DateTime = "2020-09-16T19:30:00.0000000", TimeZone = "Pacific Standard Time" }
+	};
+		
+	var result2 = await client.Users[user].Events[result.Id].Request().UpdateAsync(patchEventObject);
+	result2.Dump();
+}
+
+static async Task CreateAndUpdateEventUTC(Microsoft.Graph.GraphServiceClient client, string user)
+{
+	var @event = new Event
+	{
+		Subject = "Test subject - Created with UTC",
+		Body = new ItemBody { Content = "Test body content" },
+		Start = new DateTimeTimeZone { DateTime = "2020-09-17T01:00:00Z", TimeZone = "UTC" },
+		End = new DateTimeTimeZone { DateTime = "2020-09-17T01:30:00Z", TimeZone = "UTC" }
+	};
+
+	var result = await client.Users[user].Events.Request().AddAsync(@event);
+	result.Dump();
+
+	var patchEventObject = new Event
+	{   // UTC is 8 hours ahead of PST
+
+		Start = new DateTimeTimeZone { DateTime = "2020-09-17T02:00:00.0000000", TimeZone = "UTC" },
+		End = new DateTimeTimeZone { DateTime = "2020-09-17T02:30:00.0000000", TimeZone = "UTC" }
+
+		// This format works as well
+		//Start = new DateTimeTimeZone { DateTime = "2020-09-17T02:00:00Z", TimeZone = "UTC" },
+		//End = new DateTimeTimeZone { DateTime = "2020-09-17T02:30:00Z", TimeZone = "UTC" }
+		
+	};
+
+	var result2 = await client.Users[user].Events[result.Id].Request().UpdateAsync(patchEventObject);
+	result2.Dump();
 }
 
 static async Task CreateGroup(Microsoft.Graph.GraphServiceClient client)

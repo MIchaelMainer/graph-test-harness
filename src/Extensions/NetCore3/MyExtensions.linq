@@ -1,3 +1,4 @@
+<!--
 <Query Kind="Program">
   <NuGetReference>Microsoft.Graph</NuGetReference>
   <NuGetReference Prerelease="true">Microsoft.Graph.Auth</NuGetReference>
@@ -5,12 +6,40 @@
   <Namespace>Microsoft.Graph</Namespace>
   <Namespace>Microsoft.Graph.Auth</Namespace>
   <Namespace>Microsoft.Identity.Client</Namespace>
-  <Namespace>System.Threading.Tasks</Namespace>
 </Query>
-
-
+-->
 /*
+void Main()
+{
+	// Write code to test your extensions here. Press F5 to compile and run.
+}
 
+public static class MyExtensions
+{
+	// Write custom extension methods here. They will be available to all queries.
+	
+}
+
+// Get clients setup to use the chambele tenant. Only uses the v1 client.
+namespace Chambele
+{
+	public static class V1
+	{
+		public static Microsoft.Graph.GraphServiceClient GetConfidentialClient()
+		{
+			var authClient = ConfidentialClientApplicationBuilder
+							   .Create(Util.GetPassword("chambele_clientId"))
+							   .WithTenantId(Util.GetPassword("chambele_tenantId"))
+							   .WithClientSecret(Util.GetPassword("chambele_clientsecret"))
+							   .Build();
+
+			ClientCredentialProvider authenticationProvider = new ClientCredentialProvider(authClient);
+			return new GraphServiceClient(authenticationProvider);
+		}
+	}
+}
+
+// Get clients setup to use the M365x462896 tenant. Only uses the v1 client.
 namespace M365x462896
 {
 	/// <summary>Get V1 generated clients using Microsoft.Graph.Auth.</summary>
@@ -41,5 +70,4 @@ namespace M365x462896
 		}
 	}
 }
-
 */
