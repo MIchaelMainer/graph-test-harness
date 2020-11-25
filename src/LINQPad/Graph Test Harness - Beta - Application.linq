@@ -1,4 +1,5 @@
 <Query Kind="Program">
+  <NuGetReference Prerelease="true">Microsoft.Graph.Auth</NuGetReference>
   <NuGetReference Prerelease="true">Microsoft.Graph.Beta</NuGetReference>
   <NuGetReference>Microsoft.Identity.Client</NuGetReference>
   <Namespace>Microsoft.Graph</Namespace>
@@ -26,9 +27,23 @@ private static GraphServiceClient _graphClient;
 
 void Main()
 {
-	GraphServiceClient graphClient = GetAuthenticatedGraphClient(AuthenticationMode.ClientSecret);
+	//GraphServiceClient graphClient = GetAuthenticatedGraphClient(AuthenticationMode.ClientSecret);
+	//graphClient.Users.Request().GetAsync().Result[0].DisplayName.Dump("Graph result");
 	
-	graphClient.Users.Request().GetAsync().Result[0].DisplayName.Dump("Graph result");
+	Run();
+}
+
+
+
+private static Microsoft.Graph.Auth.ClientCredentialProvider ClientCredentialProvider()
+{
+	var authClient = ConfidentialClientApplicationBuilder
+					   .Create(Util.GetPassword("chambele_clientId"))
+					   .WithTenantId(Util.GetPassword("chambele_tenantId"))
+					   .WithClientSecret(Util.GetPassword("chambele_clientsecret"))
+					   .Build();
+
+	return new Microsoft.Graph.Auth.ClientCredentialProvider(authClient);
 }
 
 private GraphServiceClient GetAuthenticatedGraphClient(AuthenticationMode authenticationMode)

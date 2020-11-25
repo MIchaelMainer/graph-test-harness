@@ -22,7 +22,7 @@ void Main()
 private GraphServiceClient GetAuthenticatedGraphClient()
 {
 	var authenticationProvider = CreateAuthorizationProvider();
-	_graphClient = new GraphServiceClient(authenticationProvider);
+	_graphClient = new Microsoft.Graph.GraphServiceClient(authenticationProvider);
 	return _graphClient;
 }
 

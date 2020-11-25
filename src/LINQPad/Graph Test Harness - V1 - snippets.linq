@@ -1,45 +1,142 @@
 <Query Kind="Program">
   <NuGetReference>Microsoft.Graph</NuGetReference>
+  <NuGetReference Prerelease="true">Microsoft.Graph.Auth</NuGetReference>
   <Namespace>Microsoft.Graph</Namespace>
+  <Namespace>Microsoft.Graph.Auth</Namespace>
+  <Namespace>Microsoft.Graph.Auth.Extensions</Namespace>
+  <Namespace>Microsoft.Graph.CallRecords</Namespace>
+  <Namespace>Microsoft.Graph.Core.Requests</Namespace>
+  <Namespace>Microsoft.Graph.Extensions</Namespace>
+  <Namespace>Newtonsoft.Json</Namespace>
+  <Namespace>Newtonsoft.Json.Bson</Namespace>
+  <Namespace>Newtonsoft.Json.Converters</Namespace>
   <Namespace>Newtonsoft.Json.Linq</Namespace>
+  <Namespace>Newtonsoft.Json.Schema</Namespace>
+  <Namespace>Newtonsoft.Json.Serialization</Namespace>
+  <Namespace>System.Net.Http</Namespace>
+  <Namespace>System.Runtime.Serialization.Formatters</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
-  <Namespace>M365x462896</Namespace>
+  <DisableMyExtensions>true</DisableMyExtensions>
 </Query>
 
 async Task Main()
 {
-	//var client = M365x462896.V1.GetConfidentialClient();
-	var chambele_client = Chambele.V1.GetConfidentialClient();
+	var chambele_client_confidential = Chambele.V1.GetConfidentialGraphClient();
 
-	//await Temp(client);
-	await UseChambele(chambele_client);
-
-	//await DownloadDoc(client);
-	//await GetUser(client);
-	//await GetUsers(client);
-	//await CreateMailfolders(client);
-	//await CalendarView(client);
-	//await CreateGroup(client);
-}
-
-static async Task UseChambele(Microsoft.Graph.GraphServiceClient client)
-{
-	var user = "michael@chambele.onmicrosoft.com";
-	
-	await CreateAndUpdateEvent(client, user);
-	await CreateAndUpdateEventUTC(client, user);
+	await GetJoinWebUrl(chambele_client_confidential);
+	//await Temp(chambele_client_confidential);
 }
 
 static async Task Temp(Microsoft.Graph.GraphServiceClient client)
 {
-		//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Onenote.Pages["1-65b7cbcdd6104f6caa997ca5ede84206!91-76e4ca31-3239-4a7f-a0ef-c61e60ad92ab"].ParentNotebook.Request().GetAsync();
-		//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Onenote.Pages["1-65b7cbcdd6104f6caa997ca5ede84206!91-76e4ca31-3239-4a7f-a0ef-c61e60ad92ab"].Request().GetAsync();
-		//var result2 = await client.Users["adelev@M365x462896.onmicrosoft.com"].Onenote.Pages["1-65b7cbcdd6104f6caa997ca5ede84206!91-76e4ca31-3239-4a7f-a0ef-c61e60ad92ab"].Request().Expand(x => x.ParentSection).GetAsync();
-		//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Root.Children.Request().Expand(i => i.Analytics).GetAsync();
-		//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Root.Children.Request().GetAsync();
-		//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Items["01KA5JMEA7GNMTADXTINDZ7OW7ROGFDU7N"].Request().Expand(i => i.Analytics).GetAsync();
-		//var result = await client.Users.Request().Expand("approleassignments").Select("id,mail,displayname,userPrincipalName,MobilePhone,Department,OfficeLocation,UserType,DeletedDateTime,createddatetime").GetAsync();
+	var users = await client.Users.Request().Filter("mail eq 'michael@chambele.onmicrosoft.com'").GetAsync();
+	users.Dump();
+
+
+
+	//await client.AppCatalogs.TeamsApps[""].Request().CreateAsync(
+	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Onenote.Pages["1-65b7cbcdd6104f6caa997ca5ede84206!91-76e4ca31-3239-4a7f-a0ef-c61e60ad92ab"].ParentNotebook.Request().GetAsync();
+	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Onenote.Pages["1-65b7cbcdd6104f6caa997ca5ede84206!91-76e4ca31-3239-4a7f-a0ef-c61e60ad92ab"].Request().GetAsync();
+	//var result2 = await client.Users["adelev@M365x462896.onmicrosoft.com"].Onenote.Pages["1-65b7cbcdd6104f6caa997ca5ede84206!91-76e4ca31-3239-4a7f-a0ef-c61e60ad92ab"].Request().Expand(x => x.ParentSection).GetAsync();
+	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Root.Children.Request().Expand(i => i.Analytics).GetAsync();
+	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Root.Children.Request().GetAsync();
+	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Items["01KA5JMEA7GNMTADXTINDZ7OW7ROGFDU7N"].Request().Expand(i => i.Analytics).GetAsync();
+	//var result = await client.Users.Request().Expand("approleassignments").Select("id,mail,displayname,userPrincipalName,MobilePhone,Department,OfficeLocation,UserType,DeletedDateTime,createddatetime").GetAsync();
 }
+
+static async Task GetJoinWebUrl(GraphServiceClient client)
+{
+	string body = string.Format("joinweburl%20eq%20'{0}'", Chambele.V1.JoinWebUrl);
+
+	var meetingsPage = await client.Users[Chambele.V1.user].OnlineMeetings.Request().Filter(body).GetAsync();
+	meetingsPage.Dump(nameof(meetingsPage));
+}
+
+static async Task SearchDrive(Microsoft.Graph.GraphServiceClient client)
+{
+	var searchResults = await client.Users[Chambele.V1.user].Drives["b!PjyRhY4Wj0GXmwrlvqF0qz5yxyhyQaNNmv-RlWgxtlyGoRo1wOogSb-XMgXCnxJO"].Search("folder").Request().GetAsync();
+	searchResults.Dump(nameof(searchResults));
+}
+
+static async Task Group_GetNonExistentGroup(Microsoft.Graph.GraphServiceClient client)
+{
+	var group = await client.Groups["676aff12-2525-4463-97da-5550ff425d05"].Request().GetAsync();
+	group.Dump();
+}
+
+static async Task ValidatePrimitiveMethod(Microsoft.Graph.GraphServiceClient client)
+{
+	await client.Users[Chambele.V1.user].Drive.Items["01DVF26FGQUWUQODOYUZGZ7CJ5YDPDI6J4"].Workbook.Worksheets["sheet1"].Charts.Count().Request().GetAsync();
+}
+
+static async Task Composable(Microsoft.Graph.GraphServiceClient client)
+{
+	//await client.Drive.Items["fileId"].Workbook.Worksheets["worksheetId"].Range("A1").
+}
+
+static async Task TestBatch()
+{
+	var httpClient = Chambele.V1.GetConfidentialHttpClient();
+	// Make dummy request to get token into cache
+	HttpRequestMessage httpRequestMessage_dummy = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}");
+	Console.WriteLine("Get token");
+	var stopwatchToken = Stopwatch.StartNew();
+	var result = await httpClient.SendAsync(httpRequestMessage_dummy);
+	stopwatchToken.Stop();
+	Console.WriteLine(stopwatchToken.Elapsed.TotalMilliseconds.ToString());
+
+	// Manual
+	HttpRequestMessage httpRequestMessage_m1 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}");
+	HttpRequestMessage httpRequestMessage_m2 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/calendars");
+	HttpRequestMessage httpRequestMessage_m3 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/messages/{Chambele.V1.messageWithAttachment_Id}/attachments/{Chambele.V1.attachmentId}/$value");
+	HttpRequestMessage httpRequestMessage_m4 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/messages/{Chambele.V1.messageWithAttachment_Id}/$value");
+	HttpRequestMessage httpRequestMessage_m5 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/drive/root/search(q='finance')?select=name,id,webUrl");
+	
+	var stopwatch1 = Stopwatch.StartNew();
+	await httpClient.SendAsync(httpRequestMessage_m1);
+	await httpClient.SendAsync(httpRequestMessage_m2);
+	//await httpClient.SendAsync(httpRequestMessage_m3);
+	//await httpClient.SendAsync(httpRequestMessage_m4);
+	//await httpClient.SendAsync(httpRequestMessage_m5);
+	stopwatch1.Stop();
+
+	// Batch
+	HttpRequestMessage httpRequestMessage_b1 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}");
+	HttpRequestMessage httpRequestMessage_b2 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/calendars");
+	HttpRequestMessage httpRequestMessage_b3 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/messages/{Chambele.V1.messageWithAttachment_Id}/attachments/{Chambele.V1.attachmentId}/$value");
+	HttpRequestMessage httpRequestMessage_b4 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/messages/{Chambele.V1.messageWithAttachment_Id}/$value");
+	HttpRequestMessage httpRequestMessage_b5 = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users/{Chambele.V1.user}/drive/root/search(q='finance')?select=name,id,webUrl");
+
+	// Add batch request steps to BatchRequestContent.
+	BatchRequestContent batchRequestContent = new BatchRequestContent();
+	batchRequestContent.AddBatchRequestStep(httpRequestMessage_b1);
+	batchRequestContent.AddBatchRequestStep(httpRequestMessage_b2);
+	//batchRequestContent.AddBatchRequestStep(httpRequestMessage_b3);
+	//batchRequestContent.AddBatchRequestStep(httpRequestMessage_b4);
+	//batchRequestContent.AddBatchRequestStep(httpRequestMessage_b5);
+
+	
+	var batchStopwatch = Stopwatch.StartNew();
+	// Send batch request with BatchRequestContent. 
+	await httpClient.PostAsync("https://graph.microsoft.com/v1.0/$batch", batchRequestContent);
+	batchStopwatch.Stop();
+
+	Console.WriteLine("Batch");
+	Console.WriteLine(batchStopwatch.Elapsed.TotalMilliseconds.ToString());	
+	Console.WriteLine("Manual");
+	Console.WriteLine(stopwatch1.Elapsed.TotalMilliseconds.ToString());
+}
+
+
+static async Task UseChambele(Microsoft.Graph.GraphServiceClient client)
+{
+	
+	
+	await CreateAndUpdateEvent(client, Chambele.V1.user);
+	await CreateAndUpdateEventUTC(client, Chambele.V1.user);
+}
+
+
 
 static async Task CreateAndUpdateEvent(Microsoft.Graph.GraphServiceClient client, string user)
 {
@@ -256,4 +353,37 @@ static async Task DeltaQuery(GraphServiceClient client)
 		}
 	}
 
+}
+
+// Get clients setup to use the chambele tenant. Only uses the v1 client.
+namespace Chambele
+{
+	public static class V1
+	{
+		public static string user = "michael@chambele.onmicrosoft.com";
+		public static string messageWithAttachment_Id = "AAMkADE4NmViZTM1LTE5NWYtNDM5NS05ZWNiLTAzOGMzMTJlZDZhOQBGAAAAAABQxBLf_AP_TIifsgqw7XDwBwDbMXxdZjcWTIGiiYxXPUznAAAAAAEMAADbMXxdZjcWTIGiiYxXPUznAAAtZdglAAA=";
+		public static string attachmentId = "AAMkADE4NmViZTM1LTE5NWYtNDM5NS05ZWNiLTAzOGMzMTJlZDZhOQBGAAAAAABQxBLf_AP_TIifsgqw7XDwBwDbMXxdZjcWTIGiiYxXPUznAAAAAAEMAADbMXxdZjcWTIGiiYxXPUznAAAtZdglAAABEgAQALmGlhZxBNRKhrRzIWv3B4I=";
+		public const string JoinWebUrl = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZDU5YmM4Y2YtYTgxNC00NDdlLTk5NDEtYzIzNmM4OTYxMmQy%40thread.v2/0?context=%7b%22Tid%22%3a%22fe639da9-7429-46bf-9a68-40cfc8229591%22%2c%22Oid%22%3a%225cae63f5-0216-4766-8ca3-84d5e288e796%22%7d";
+		
+		private static IAuthenticationProvider GetClientCredentialProvider()
+		{
+			var authClient = Microsoft.Identity.Client.ConfidentialClientApplicationBuilder
+							   .Create(Util.GetPassword("chambele_clientId"))
+							   .WithTenantId(Util.GetPassword("chambele_tenantId"))
+							   .WithClientSecret(Util.GetPassword("chambele_clientsecret"))
+							   .Build();
+
+			return new ClientCredentialProvider(authClient);
+		}
+
+		public static Microsoft.Graph.GraphServiceClient GetConfidentialGraphClient()
+		{
+			return new GraphServiceClient(GetClientCredentialProvider());
+		}
+
+		public static HttpClient GetConfidentialHttpClient()
+		{
+			return GraphClientFactory.Create(GetClientCredentialProvider());
+		}
+	}
 }

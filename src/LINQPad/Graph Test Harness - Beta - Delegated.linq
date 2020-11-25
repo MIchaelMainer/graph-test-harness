@@ -14,30 +14,9 @@ private static GraphServiceClient _graphClient;
 
 async void Main()
 {
-	GraphServiceClient graphClient = GetAuthenticatedGraphClient();
+
 	
-	//graphClient.Users.Request().GetAsync().Result[0].DisplayName.Dump("Graph result");
-
-
-	var externalConnection = new ExternalConnection
-	{
-		Id = "contosohr",
-		Name = "Contoso HR",
-		Description = "Description"
-	};
-
-    await graphClient.Reports.GetOneDriveActivityUserDetail("D7").Request().GetAsync()
-
-string result = await graphClient.Education
-								 .SynchronizationProfiles[""]
-								 .UploadUrl()
-								 .Request()
-								 .GetAsync();
 	
-IDirectoryObjectCheckMemberGroupsCollectionPage page = await graphClient.Me
-																		.CheckMemberGroups(new List<string>())
-																		.Request()
-																		.PostAsync();
 
 }
 

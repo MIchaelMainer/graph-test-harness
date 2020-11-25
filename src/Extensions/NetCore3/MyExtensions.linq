@@ -1,13 +1,8 @@
-<!--
 <Query Kind="Program">
-  <NuGetReference>Microsoft.Graph</NuGetReference>
-  <NuGetReference Prerelease="true">Microsoft.Graph.Auth</NuGetReference>
-  <NuGetReference>Microsoft.Identity.Client</NuGetReference>
-  <Namespace>Microsoft.Graph</Namespace>
-  <Namespace>Microsoft.Graph.Auth</Namespace>
-  <Namespace>Microsoft.Identity.Client</Namespace>
+  <IncludeUncapsulator>false</IncludeUncapsulator>
 </Query>
--->
+
+
 /*
 void Main()
 {
@@ -71,3 +66,14 @@ namespace M365x462896
 	}
 }
 */
+
+
+#region Advanced - How to multi-target
+
+// The NET5 symbol can be useful when you want to run some queries under .NET 5 and others under .NET Core 3:
+
+#if NET5
+// Code that requires .NET 5 or later
+#endif
+
+#endregion

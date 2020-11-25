@@ -21,7 +21,12 @@ public static class Beta
 						   .Build();
 
 		ClientCredentialProvider authenticationProvider = new ClientCredentialProvider(authClient);
-		return new GraphServiceClient(authenticationProvider);
+		var client = new Microsoft.Graph.GraphServiceClient(authenticationProvider);
+		
+		client.Places.Request()
+		
+		return client;
+		
 	}
 
 	/// <summary>Gets a public client application. You will need to use the Request() .WithUsernamePassword(email, password)</summary>
