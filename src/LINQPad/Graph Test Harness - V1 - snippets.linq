@@ -23,16 +23,12 @@ async Task Main()
 {
 	var chambele_client_confidential = Chambele.V1.GetConfidentialGraphClient();
 
-	await GetJoinWebUrl(chambele_client_confidential);
+	await DriveItemSearch(chambele_client_confidential);
 	//await Temp(chambele_client_confidential);
 }
 
 static async Task Temp(Microsoft.Graph.GraphServiceClient client)
 {
-	var users = await client.Users.Request().Filter("mail eq 'michael@chambele.onmicrosoft.com'").GetAsync();
-	users.Dump();
-
-
 
 	//await client.AppCatalogs.TeamsApps[""].Request().CreateAsync(
 	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Onenote.Pages["1-65b7cbcdd6104f6caa997ca5ede84206!91-76e4ca31-3239-4a7f-a0ef-c61e60ad92ab"].ParentNotebook.Request().GetAsync();
@@ -42,6 +38,17 @@ static async Task Temp(Microsoft.Graph.GraphServiceClient client)
 	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Root.Children.Request().GetAsync();
 	//var result = await client.Users["adelev@M365x462896.onmicrosoft.com"].Drive.Items["01KA5JMEA7GNMTADXTINDZ7OW7ROGFDU7N"].Request().Expand(i => i.Analytics).GetAsync();
 	//var result = await client.Users.Request().Expand("approleassignments").Select("id,mail,displayname,userPrincipalName,MobilePhone,Department,OfficeLocation,UserType,DeletedDateTime,createddatetime").GetAsync();
+}
+
+static async Task HttpTemp(GraphServiceClient client)
+{
+	var allApps = await client.DeviceAppManagement.MobileApps.Request().Filter("isOf('microsoft.graph.win32LobApp')").GetAsync();
+	var allCategories = await client.DeviceAppManagement.MobileAppCategories.Request().GetAsync();
+	var hrm = client.DeviceAppManagement.MobileApps["mobileAppId"].Categories.References.Request().GetHttpRequestMessage();
+	hrm.Method = HttpMethod.Post;
+	hrm.Content = new StringContent($"{{\"@odata.id\": \"https://graph.microsoft.com/v1.0/deviceAppManagement/mobileAppCategories/{allCategories[2]}\"}}");
+	var response = await client.HttpProvider.SendAsync(hrm);
+
 }
 
 static async Task GetJoinWebUrl(GraphServiceClient client)
@@ -136,7 +143,10 @@ static async Task UseChambele(Microsoft.Graph.GraphServiceClient client)
 	await CreateAndUpdateEventUTC(client, Chambele.V1.user);
 }
 
-
+static async Task DriveItemSearch(Microsoft.Graph.GraphServiceClient client)
+{
+	var result = client.Users[Chambele.V1.user].Drive.Root.Search().Request().GetAsync();
+}
 
 static async Task CreateAndUpdateEvent(Microsoft.Graph.GraphServiceClient client, string user)
 {
@@ -218,6 +228,36 @@ static async Task CreateGroup(Microsoft.Graph.GraphServiceClient client)
 	.AddAsync(group);
 }
 
+static async Task GetMessagesWithOptions(Microsoft.Graph.GraphServiceClient client)
+{
+	var queryOptions = new List<QueryOption>()
+	{
+		new QueryOption("select", "subject"),
+		new QueryOption("$count", "true")
+	};
+
+	var messages = await client.Users[Chambele.V1.user].Messages
+   								.Request(queryOptions)
+								.GetAsync();
+
+	messages.Dump();
+}
+
+static async Task GetHiddenFolders(Microsoft.Graph.GraphServiceClient client)
+{
+	var queryOptions = new List<QueryOption>()
+	{
+		new QueryOption("includeHiddenFolders", "true")
+	};
+
+	var hiddenFolders = await client.Users[Chambele.V1.user]
+									.MailFolders
+   									.Request(queryOptions)
+									.GetAsync();
+
+	hiddenFolders.Dump();
+}
+
 static async Task CalendarView(Microsoft.Graph.GraphServiceClient client)
 {
 	var queryOptions = new List<QueryOption>()
@@ -226,7 +266,7 @@ static async Task CalendarView(Microsoft.Graph.GraphServiceClient client)
 		new QueryOption("endDateTime", "2020-01-07T19:00:00-08:00Z")
 	};
 
-	var calendarView = await client.Users["adelev@M365x462896.onmicrosoft.com"].CalendarView
+	var calendarView = await client.Users[Chambele.V1.user].CalendarView
 		.Request(queryOptions)
 		.GetAsync();
 		
@@ -372,15 +412,15 @@ namespace Chambele
 							   .WithTenantId(Util.GetPassword("chambele_tenantId"))
 							   .WithClientSecret(Util.GetPassword("chambele_clientsecret"))
 							   .Build();
-
+		
 			return new ClientCredentialProvider(authClient);
 		}
-
+		
 		public static Microsoft.Graph.GraphServiceClient GetConfidentialGraphClient()
 		{
 			return new GraphServiceClient(GetClientCredentialProvider());
 		}
-
+		
 		public static HttpClient GetConfidentialHttpClient()
 		{
 			return GraphClientFactory.Create(GetClientCredentialProvider());

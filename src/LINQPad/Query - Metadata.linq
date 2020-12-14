@@ -82,7 +82,7 @@ xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Action")
 		 .Where(m => m.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Parameter")
 		 	.First()
 			.Attributes("Type")
-			.Any(x => x.Value.Equals("graph.workbookRange")))
+			.Any(x => x.Value.Contains("Collection")))
 		 .Dump("All actions to bound workbookRange");
 */
 
@@ -102,7 +102,7 @@ xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Function")
 			.Attributes("Type")
 			.Any(x => x.Value.Contains("graph.workbookChart")))
 		 .Dump("All functions to bound workbookChart");
-*/		 
+*/
 
 // Get all functions
 //var allFunctions = xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Function");
@@ -137,6 +137,7 @@ results4.Dump("Functions with primitive collection");
 //		 .Where(m => m.Attributes("IsComposable").Any())
 //         .Dump("All composable functions");
 
+/*
 xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Function")
 		 .Where(m => m.Attributes("IsComposable").Any())
 		 .Where(m => m.Descendants("{http://docs.oasis-open.org/odata/ns/edm}ReturnType")
@@ -144,4 +145,11 @@ xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Function")
 			.Any(x => !x.Value.Contains("graph.report")))
 		 .Dump("All composable functions without report root");
 		 
+*/
 
+xMetadata.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Action")
+		 .Where(m => m.Descendants("{http://docs.oasis-open.org/odata/ns/edm}Parameter")
+		 	.First()
+			.Attributes("Type")
+			.Any(x => x.Value.Contains("Collection")))
+		 .Dump("All actions to bound workbookRange");
